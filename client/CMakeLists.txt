@@ -1,0 +1,6 @@
+cmake_minimum_required(VERSION 3.15.4 FATAL_ERROR)
+include_directories("../vendor/curl/include" SYSTEM)
+file(GLOB_RECURSE CPP_SOURCE_FILES "src/*.cpp")
+add_executable(client ${CPP_SOURCE_FILES})
+target_link_libraries(client libcurl)
+set_property(TARGET client PROPERTY CXX_STANDARD 17)
