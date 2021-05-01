@@ -1,0 +1,1 @@
+cmake . -B build/ -G "Unix Makefiles" -DBUILD_TESTS=OFF

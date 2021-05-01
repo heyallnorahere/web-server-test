@@ -1,0 +1,3 @@
+[submodule "vendor/restbed"]
+	path = vendor/restbed
+	url = https://github.com/Corvusoft/restbed
