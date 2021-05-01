@@ -1,0 +1,8 @@
+cmake_minimum_required(VERSION 3.15.4 FATAL_ERROR)
+include_directories(SYSTEM "../vendor/json/include")
+include_directories("include")
+file(GLOB_RECURSE CPP_SOURCE_FILES "src/*.cpp")
+file(GLOB_RECURSE PRIVATE_HEADER_FILES "src/*.h")
+file(GLOB_RECURSE PUBLIC_HEADER_FILES "include/*.h")
+add_library(api-standard STATIC ${CPP_SOURCE_FILES} ${PRIVATE_HEADER_FILES} ${PUBLIC_HEADER_FILES})
+set_property(TARGET api-standard PROPERTY CXX_STANDARD 17)
