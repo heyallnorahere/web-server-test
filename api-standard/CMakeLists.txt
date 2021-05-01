@@ -1,4 +1,7 @@
 cmake_minimum_required(VERSION 3.15.4 FATAL_ERROR)
+if(UNIX AND NOT APPLE)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive")
+endif()
 include_directories(SYSTEM "../vendor/json/include")
 include_directories("include")
 file(GLOB_RECURSE CPP_SOURCE_FILES "src/*.cpp")
