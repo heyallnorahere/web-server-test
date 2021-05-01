@@ -18,4 +18,4 @@ jobs:
           ${{github.workspace}}/unix-genprojects.sh Debug
       - name: build
         run: |
-          make -C ${{github.workspace}}
+          make -C ${{github.workspace}}/build
