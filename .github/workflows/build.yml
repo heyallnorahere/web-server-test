@@ -1,0 +1,13 @@
+name: build
+on: [ push ]
+jobs:
+  ubuntu-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: configure cmake
+        run: |
+          ${{github.workspace}}/unix-genprojects.sh Debug
+      - name: build
+        run: |
+          make -C ${{github.workspace}}
