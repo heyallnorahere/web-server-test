@@ -1,9 +1,16 @@
 #include "handlers.h"
 #include <api-standard.h>
 #include <iostream>
-void print_colored(const apistandard::message& message) {
-    std::cout << message.content << std::endl;
+#ifdef SYSTEM_UNIX
+void print_colored_unix(const apistandard::message& message) {
+    // didnt realize i did this until just now, as of writing this code
+    uint32_t terminal_color_code = 30 + message.color;
+    std::cout << "\033[" << terminal_color_code << "m" << message.content << "\033[37m" << std::endl;
 }
+#define print_colored print_colored_unix
+#else
+#error PLATFORM NOT SUPPORTED!
+#endif
 struct response_struct {
     std::string content;
     apistandard::color color = apistandard::RED | apistandard::GREEN | apistandard::BLUE;

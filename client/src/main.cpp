@@ -39,6 +39,9 @@ int main(int argc, const char* argv[]) {
             { "blue", apistandard::BLUE },
             { "black", 0 },
             { "white", apistandard::RED | apistandard::GREEN | apistandard::BLUE },
+            { "yellow", apistandard::RED | apistandard::GREEN },
+            { "lightblue", apistandard::GREEN | apistandard::BLUE },
+            { "purple", apistandard::RED | apistandard::BLUE },
         };
         color = colors[argv[3]];
     }

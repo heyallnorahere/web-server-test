@@ -1,5 +1,11 @@
 cmake_minimum_required(VERSION 3.15.4 FATAL_ERROR)
 include_directories(SYSTEM "../vendor/restbed/source" "../vendor/json/include" "../api-standard/include")
+if(WIN32)
+    add_compile_definitions(SYSTEM_WINDOWS)
+else()
+    add_compile_definitions(SYSTEM_UNIX)
+endif()
+
 file(GLOB_RECURSE CPP_SOURCE_FILES "src/*.cpp")
 file(GLOB_RECURSE PRIVATE_HEADER_FILES "src/*.h")
 add_executable(server ${CPP_SOURCE_FILES} ${PRIVATE_HEADER_FILES})
