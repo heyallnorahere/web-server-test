@@ -5,12 +5,14 @@
 #include <string>
 void post_request_handler(const std::shared_ptr<restbed::Session> session) {
     const auto request = session->get_request();
-    auto& body = request->get_body();
-    std::cout << "Content-Length: " << request->get_header("Content-Length") << std::endl;
+    size_t length = request->get_header("Content-Length", 0);
+    std::cout << "Content-Length: " << length << std::endl;
     std::cout << "Content-Type: " << request->get_header("Content-Type") << std::endl;
-    std::string post_content = std::string((char*)body.data(), body.size());
-    std::cout << "Got POST request: " << post_content << std::endl;
-    session->close(restbed::OK, "Hello!", { { "Content-Length", "6" }, { "Content-Type", "text" } });
+    session->fetch(length, [](std::shared_ptr<restbed::Session> session, const restbed::Bytes& body) {
+        std::string post_content = std::string((char*)body.data(), body.size());
+        std::cout << "Got POST request: " << post_content << std::endl;
+        session->close(restbed::OK, "Hello!", { { "Content-Length", "6" }, { "Content-Type", "text" } });
+    });
 }
 int main(int argc, const char* argv[]) {
     int port = atoi(argv[1]);
