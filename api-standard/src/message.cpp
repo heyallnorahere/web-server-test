@@ -6,7 +6,7 @@ namespace apistandard {
         j["color"].get_to(m.color);
         if (!j["from"].is_null()) {
             j["from"]["id"].get_to(m.from.id);
-            j["from"]["password"].get_to(m.from.id);
+            j["from"]["password"].get_to(m.from.password);
             m.from.exists = true;
         }
     }

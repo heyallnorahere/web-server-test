@@ -19,11 +19,13 @@ void print_colored_unix(const apistandard::message& message) {
 struct response_struct {
     std::string content;
     apistandard::color color = apistandard::RED | apistandard::GREEN | apistandard::BLUE;
+    std::string error = "";
     bool succeeded = false;
 };
 void to_json(nlohmann::json& j, const response_struct& rs) {
     j["content"] = rs.content;
     j["color"] = rs.color;
+    j["error"] = rs.error;
     j["succeeded"] = rs.succeeded;
 }
 void message_handler(const std::shared_ptr<restbed::Session> session) {
@@ -39,6 +41,7 @@ void message_handler(const std::shared_ptr<restbed::Session> session) {
             response.content = message.content;
             response.color = message.color;
             if (message.from.exists && !userdatabase::database->verify_creds(message.from.id, message.from.password)) {
+                response.error = "Credentials were incorrect";
                 json_data = response;
                 session->close(restbed::UNAUTHORIZED, json_data.dump());
                 return;
