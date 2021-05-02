@@ -6,7 +6,10 @@
 void get_user_handler(const std::shared_ptr<restbed::Session> session) {
     size_t id = session->get_request()->get_path_parameter("id", 0);
     auto user = userdatabase::database->get(id);
-    nlohmann::json json_data = user;
+    apistandard::getuser getuserdata;
+    getuserdata.id = user.id;
+    getuserdata.displayname = user.displayname;
+    nlohmann::json json_data = getuserdata;
     session->close(restbed::OK, json_data.dump());
 }
 void new_user_handler(const std::shared_ptr<restbed::Session> session) {
