@@ -7,6 +7,7 @@ This is a little server-client program I'm working on. Current supported platfor
 Libraries required on all platforms:
 - OpenSSL >= 1.1.1
 - OpenGL >= 3.3
+
 Libraries required on Unix systems:
 - Asio
 - libssh2
