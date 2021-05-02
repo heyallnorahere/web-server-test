@@ -10,3 +10,12 @@
 [submodule "vendor/cpp-base64"]
 	path = vendor/cpp-base64
 	url = https://github.com/ReneNyffenegger/cpp-base64
+[submodule "vendor/glfw"]
+	path = vendor/glfw
+	url = https://github.com/glfw/glfw
+[submodule "vendor/glad"]
+	path = vendor/glad
+	url = https://github.com/Dav1dde/glad
+[submodule "vendor/imgui"]
+	path = vendor/imgui
+	url = https://github.com/ocornut/imgui
