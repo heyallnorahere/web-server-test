@@ -4,7 +4,8 @@
 #include <cstdlib>
 #include <string>
 #include "handlers.h"
-void post_request_handler(const std::shared_ptr<restbed::Session> session) {
+#include "userdatabase.h"
+static void post_request_handler(const std::shared_ptr<restbed::Session> session) {
     const auto request = session->get_request();
     size_t length = request->get_header("Content-Length", 0);
     std::cout << "Content-Length: " << length << std::endl;
@@ -15,7 +16,22 @@ void post_request_handler(const std::shared_ptr<restbed::Session> session) {
         session->close(restbed::OK, "Hello!");
     });
 }
+static bool file_exists(const std::string& path) {
+    FILE* f = fopen(path.c_str(), "rb");
+    bool exists = f;
+    if (f) fclose(f);
+    return exists;
+}
 int main(int argc, const char* argv[]) {
+    std::string data_directory = "serverdata";
+    if (argc > 2) {
+        data_directory = argv[3];
+    }
+    userdatabase::database = std::make_shared<userdatabase>();
+    userdatabase::database->set_file_path(data_directory + "/users.json");
+    if (file_exists(userdatabase::database->get_file_path())) {
+        userdatabase::database->deserialize();
+    }
     int port = atoi(argv[1]);
     std::cout << "Hosting on port: " << port << std::endl;
     auto print = std::make_shared<restbed::Resource>();
@@ -30,6 +46,7 @@ int main(int argc, const char* argv[]) {
     restbed::Service service;
     service.publish(print);
     service.publish(message);
+    add_user_handlers(service);
     service.start(settings);
     return 0;
 }

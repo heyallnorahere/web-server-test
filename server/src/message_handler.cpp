@@ -1,11 +1,16 @@
 #include "handlers.h"
 #include <api-standard.h>
 #include <iostream>
+#include "userdatabase.h"
 #ifdef SYSTEM_UNIX
 void print_colored_unix(const apistandard::message& message) {
+    std::string displayname = "Anonymous user";
+    if (message.from.exists) {
+        displayname = userdatabase::database->get(message.from.id).displayname;
+    }
     // didnt realize i did this until just now, as of writing this code
     uint32_t terminal_color_code = 30 + message.color;
-    std::cout << "\033[" << terminal_color_code << "m" << message.content << "\033[37m" << std::endl;
+    std::cout << displayname << " says: \033[" << terminal_color_code << "m" << message.content << "\033[37m" << std::endl;
 }
 #define print_colored print_colored_unix
 #else
@@ -31,9 +36,14 @@ void message_handler(const std::shared_ptr<restbed::Session> session) {
         if (contenttype == "application/json") {
             nlohmann::json json_data = nlohmann::json::parse(data);
             apistandard::message message = json_data.get<apistandard::message>();
-            print_colored(message);
             response.content = message.content;
             response.color = message.color;
+            if (message.from.exists && !userdatabase::database->verify_creds(message.from.id, message.from.password)) {
+                json_data = response;
+                session->close(restbed::UNAUTHORIZED, json_data.dump());
+                return;
+            }
+            print_colored(message);
             response.succeeded = true;
         } else if (contenttype == "text/plain") {
             std::cout << data << std::endl;
