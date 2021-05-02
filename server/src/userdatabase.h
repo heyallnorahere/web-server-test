@@ -16,8 +16,10 @@ public:
     void deserialize();
     void set_file_path(const std::string& path);
     std::string get_file_path();
-    static std::shared_ptr<userdatabase> database;
+    static userdatabase& get_database();
 private:
     std::list<apistandard::user> m;
     std::string m_path;
+    userdatabase();
+    static userdatabase instance;
 };

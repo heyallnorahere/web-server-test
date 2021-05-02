@@ -66,10 +66,23 @@ void userdatabase::deserialize() {
     file.close();
     json_data.get_to(this->m);
 }
+static bool file_exists(const std::string& path) {
+    FILE* f = fopen(path.c_str(), "rb");
+    bool exists = f;
+    if (f) fclose(f);
+    return exists;
+}
 void userdatabase::set_file_path(const std::string& path) {
     this->m_path = path;
+    if (file_exists(this->m_path)) {
+        this->deserialize();
+    }
 }
 std::string userdatabase::get_file_path() {
     return this->m_path;
 }
-std::shared_ptr<userdatabase> userdatabase::database;
+userdatabase& userdatabase::get_database() {
+    return instance;
+}
+userdatabase::userdatabase() { }
+userdatabase userdatabase::instance;

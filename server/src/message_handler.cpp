@@ -6,7 +6,7 @@
 void print_colored_unix(const apistandard::message& message) {
     std::string displayname = "Anonymous user";
     if (message.from.exists) {
-        displayname = userdatabase::database->get(message.from.id).displayname;
+        displayname = userdatabase::get_database().get(message.from.id).displayname;
     }
     // didnt realize i did this until just now, as of writing this code
     uint32_t terminal_color_code = 30 + message.color;
@@ -40,7 +40,7 @@ void message_handler(const std::shared_ptr<restbed::Session> session) {
             apistandard::message message = json_data.get<apistandard::message>();
             response.content = message.content;
             response.color = message.color;
-            if (message.from.exists && !userdatabase::database->verify_creds(message.from.id, message.from.password)) {
+            if (message.from.exists && !userdatabase::get_database().verify_creds(message.from.id, message.from.password)) {
                 response.error = "Credentials were incorrect";
                 json_data = response;
                 session->close(restbed::UNAUTHORIZED, json_data.dump());
