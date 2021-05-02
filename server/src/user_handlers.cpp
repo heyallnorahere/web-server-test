@@ -19,8 +19,8 @@ void get_user_setting_handler(const std::shared_ptr<restbed::Session> session) {
     std::string base64_auth = authorization.substr(authorization.find_first_of(' ') + 1);
     std::string creds = base64_decode(base64_auth);
     std::string displayname = creds.substr(0, creds.find_first_of(':'));
-    // id should be validated from user_setting_auth_handler()
     size_t id = userdatabase::database->find(displayname);
+    // id should be validated from user_setting_auth_handler()
     auto user = userdatabase::database->get(id);
     std::string settingname = request->get_path_parameter("settingname");
     auto setting = apistandard::get_setting(user, settingname);
@@ -30,6 +30,36 @@ void get_user_setting_handler(const std::shared_ptr<restbed::Session> session) {
     }
     nlohmann::json json_data = setting;
     session->close(restbed::OK, json_data.dump());
+}
+void post_user_setting_handler(const std::shared_ptr<restbed::Session> session) {
+    auto request = session->get_request();
+    size_t contentlength = request->get_header("Content-Length", 0);
+    session->fetch(contentlength, [request](std::shared_ptr<restbed::Session> session, const restbed::Bytes& body) {
+        std::string authorization = request->get_header("Authorization");
+        std::string base64_auth = authorization.substr(authorization.find_first_of(' ') + 1);
+        std::string creds = base64_decode(base64_auth);
+        std::string displayname = creds.substr(0, creds.find_first_of(':'));
+        size_t id = userdatabase::database->find(displayname);
+        // see other /user/setting handler
+        auto user = userdatabase::database->get(id);
+        std::string settingname = request->get_path_parameter("settingname");
+        std::string received_data = std::string((char*)body.data(), body.size());
+        nlohmann::json json_data = nlohmann::json::parse(received_data);
+        auto setting = json_data.get<apistandard::setting>();
+        if (settingname != setting.name) {
+            session->close(restbed::FORBIDDEN);
+            return;
+        }
+        apistandard::set_setting(user, setting);
+        userdatabase::database->set(id, user);
+        auto new_setting = apistandard::get_setting(user, settingname);
+        if (new_setting.value.empty()) {
+            session->close(restbed::NOT_FOUND);
+        } else {
+            nlohmann::json json_data = new_setting;
+            session->close(restbed::OK, json_data.dump());
+        }
+    });
 }
 void user_setting_auth_handler(const std::shared_ptr<restbed::Session> session, const std::function<void(const std::shared_ptr<restbed::Session> session)>& callback) {
     auto authorize = [&]() {
@@ -73,6 +103,7 @@ void add_user_handlers(restbed::Service& service) {
     auto user_setting = std::make_shared<restbed::Resource>();
     user_setting->set_path("/user/setting/{settingname: [a-z]*}");
     user_setting->set_method_handler("GET", get_user_setting_handler);
+    user_setting->set_method_handler("POST", post_user_setting_handler);
     user_setting->set_authentication_handler(user_setting_auth_handler);
     auto new_user = std::make_shared<restbed::Resource>();
     new_user->set_path("/user/new");
