@@ -20,6 +20,12 @@ apistandard::user userdatabase::get(size_t id) {
     std::advance(it, id);
     return *it;
 }
+void userdatabase::set(size_t id, const apistandard::user& newer) {
+    auto it = this->m.begin();
+    std::advance(it, id);
+    *it = newer;
+    this->serialize();
+}
 bool userdatabase::verify_creds(size_t id, const std::string& password) {
     auto user = this->get(id);
     return user.password == password;
@@ -28,12 +34,14 @@ size_t userdatabase::new_user(const std::string& displayname, const std::string&
     size_t id = this->m.size();
     auto user = apistandard::create_user(id, displayname, password);
     this->m.push_back(user);
+    this->serialize();
     return id;
 }
 void userdatabase::delete_user(size_t id) {
     this->m.remove_if([id](auto u) {
         return u.id == id;
     });
+    this->serialize();
 }
 void userdatabase::serialize() {
     nlohmann::json json_data = this->m;
