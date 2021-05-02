@@ -30,6 +30,16 @@ bool userdatabase::verify_creds(size_t id, const std::string& password) {
     auto user = this->get(id);
     return user.password == password;
 }
+size_t userdatabase::find(const std::string& displayname) {
+    size_t id = (size_t)-1;
+    for (const auto& u : this->m) {
+        if (u.displayname == displayname) {
+            id = u.id;
+            break;
+        }
+    }
+    return id;
+}
 size_t userdatabase::new_user(const std::string& displayname, const std::string& password) {
     size_t id = this->m.size();
     auto user = apistandard::create_user(id, displayname, password);

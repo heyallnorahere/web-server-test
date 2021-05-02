@@ -4,12 +4,13 @@ This is a little server-client program I'm working on. Current supported platfor
 - Ubuntu (It's what I'm running on GitHub Actions)
 
 ## Dependencies
-Libraries required on all platforms:
+Dependencies required on all platforms:
 - OpenSSL >= 1.1.1
 - OpenGL >= 3.3
+- CMake >= 3.15.4
 
-Libraries required on Unix systems:
-- Asio
+Dependencies required on Unix systems:
+- libasio
 - libssh2
 
 ## Building
