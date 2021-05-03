@@ -53,7 +53,7 @@ namespace guifrontend {
                 header_list = curl_slist_append(header_list, header.c_str());
             }
             if (header_list) curl_easy_setopt(c, CURLOPT_HTTPHEADER, header_list);
-            assert(curl_easy_perform(c) == CURLE_OK);
+            curl_easy_perform(c);
             response r;
             long code;
             curl_easy_getinfo(c, CURLINFO_RESPONSE_CODE, &code);

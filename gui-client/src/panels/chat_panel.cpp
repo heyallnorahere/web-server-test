@@ -33,7 +33,7 @@ namespace guifrontend {
                 }
                 last_request = current_time;
             }
-            ImGui::BeginChild("Message Log", { 200, 200 }, ImGuiWindowFlags_AlwaysVerticalScrollbar);
+            ImGui::BeginChild("Message Log", { 400.f, 200.f }, ImGuiWindowFlags_AlwaysVerticalScrollbar);
             for (const auto& msg : log) {
                 ImGui::Separator();
                 ImGui::TextUnformatted(msg.from.c_str());
@@ -70,9 +70,11 @@ namespace guifrontend {
                 "Black",
             };
             message_log(address);
-            ImGui::Columns(2);
+            ImGui::Columns(3);
+            ImGui::SetColumnWidth(0, 100.f);
+            ImGui::SetColumnWidth(1, 250.f);
             ImGui::Combo("##ColorInput", &index, items.data(), items.size());
-            ImGui::SameLine();
+            ImGui::NextColumn();
             ImGui::InputText("##MessageInput", &message);
             ImGui::NextColumn();
             if (ImGui::Button("Send")) {
@@ -104,6 +106,7 @@ namespace guifrontend {
                     break;
                 }
                 auto message_struct = apistandard::create_message(message, color);
+                message.clear();
                 auto login = (login_panel*)this->m_parent->get_panel(this->m_login_panel_index).get();
                 auto login_struct = login->get_login();
                 if (login_struct.id != (size_t)-1) {

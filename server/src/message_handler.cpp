@@ -48,26 +48,20 @@ void message_handler(const std::shared_ptr<restbed::Session> session) {
         std::string data = std::string((char*)body.data(), body.size());
         std::string contenttype = request->get_header("Content-Type");
         response_struct response;
-        if (contenttype == "application/json") {
-            nlohmann::json json_data = nlohmann::json::parse(data);
-            apistandard::message message = json_data.get<apistandard::message>();
-            response.content = message.content;
-            response.color = message.color;
-            if (message.from.exists && !userdatabase::get_database().verify_creds(message.from.l.id, message.from.l.password)) {
-                response.error = "Credentials were incorrect";
-                json_data = response;
-                session->close(restbed::UNAUTHORIZED, json_data.dump());
-                return;
-            }
-            print_colored(message);
-            log::get().push_back(create_logmessage(message));
-            response.succeeded = true;
-        } else if (contenttype == "text/plain") {
-            std::cout << data << std::endl;
-            response.content = data;
-            response.succeeded = true;
+        nlohmann::json json_data = nlohmann::json::parse(data);
+        apistandard::message message = json_data.get<apistandard::message>();
+        response.content = message.content;
+        response.color = message.color;
+        if (message.from.exists && !userdatabase::get_database().verify_creds(message.from.l.id, message.from.l.password)) {
+            response.error = "Credentials were incorrect";
+            json_data = response;
+            session->close(restbed::UNAUTHORIZED, json_data.dump());
+            return;
         }
-        nlohmann::json json_data = response;
+        print_colored(message);
+        log::get().push_back(create_logmessage(message));
+        response.succeeded = true;
+        json_data = response;
         session->close(restbed::OK, json_data.dump());
     });
 }
