@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <nlohmann/json.hpp>
+#include "login.h"
 #define BINARY_FLAG(bits) (1 << (bits))
 namespace apistandard {
     enum _color : uint32_t {
@@ -14,8 +15,7 @@ namespace apistandard {
         std::string content;
         color color;
         struct {
-            size_t id;
-            std::string password;
+            login l;
             bool exists = false;
         } from;
     };

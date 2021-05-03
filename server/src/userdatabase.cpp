@@ -15,6 +15,9 @@ userdatabase::~userdatabase() {
         this->serialize();
     }
 }
+size_t userdatabase::get_user_count() {
+    return this->m.size();
+}
 apistandard::user userdatabase::get(size_t id) {
     auto it = this->m.begin();
     std::advance(it, id);

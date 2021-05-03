@@ -5,8 +5,7 @@ namespace apistandard {
         j["content"].get_to(m.content);
         j["color"].get_to(m.color);
         if (!j["from"].is_null()) {
-            j["from"]["id"].get_to(m.from.id);
-            j["from"]["password"].get_to(m.from.password);
+            j["from"].get_to(m.from.l);
             m.from.exists = true;
         }
     }
@@ -14,10 +13,7 @@ namespace apistandard {
         j["content"] = m.content;
         j["color"] = m.color;
         if (m.from.exists) {
-            j["from"] = {
-                { "id", m.from.id },
-                { "password", m.from.password }
-            };
+            j["from"] = m.from.l;
         } else {
             j["from"] = nullptr;
         }

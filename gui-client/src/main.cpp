@@ -1,18 +1,15 @@
 #include "application.h"
+#include "panels/login_panel.h"
+#include "panels/settings_panel.h"
 #include <imgui.h>
-class testpanel : public guifrontend::panel {
-public:
-    testpanel() { }
-    virtual void render() override {
-        ImGui::Begin("test panel");
-        ImGui::Text("testing");
-        ImGui::End();
-    }
-};
+void add_panels(guifrontend::application& app) {
+    using namespace guifrontend::panels;
+    app.add_panel(std::make_shared<login_panel>(1));
+    app.add_panel(std::make_shared<settings_panel>());
+}
 int main(int argc, const char* argv[]) {
-    using namespace guifrontend;
-    application app("GUI Client");
-    app.add_panel(std::make_shared<testpanel>());
+    guifrontend::application app("GUI Client");
+    add_panels(app);
     while (!app.should_window_close()) {
         app.render();
         app.update_window();

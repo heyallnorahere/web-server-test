@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.15.4 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
 include_directories(SYSTEM "../vendor/restbed/source" "../vendor/json/include" "../api-standard/include" "../vendor/cpp-base64")
 if(WIN32)
     add_compile_definitions(SYSTEM_WINDOWS)

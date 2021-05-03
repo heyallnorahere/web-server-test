@@ -36,6 +36,11 @@ namespace guifrontend {
     }
     void application::add_panel(const std::shared_ptr<panel>& p) {
         this->m_panels.push_back(p);
+        p->m_parent = this;
+        p->on_attach();
+    }
+    std::shared_ptr<panel> application::get_panel(size_t index) {
+        return this->m_panels[index];
     }
     void application::init_window(const std::string& title, double version) {
         if (!glfwInit()) {

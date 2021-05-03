@@ -12,6 +12,9 @@ namespace guifrontend {
         void update_window();
         bool should_window_close();
         void add_panel(const std::shared_ptr<panel>& p);
+        std::shared_ptr<panel> get_panel(size_t index);
+        application(const application&) = delete;
+        application operator=(const application&) = delete;
     private:
         void init_window(const std::string& title, double version);
         void terminate_window();

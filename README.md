@@ -7,7 +7,7 @@ This is a little server-client program I'm working on. Current supported platfor
 Dependencies required on all platforms:
 - OpenSSL >= 1.1.1
 - OpenGL >= 3.3
-- CMake >= 3.15.4
+- CMake >= 3.16
 
 Dependencies required on Unix systems:
 - libasio

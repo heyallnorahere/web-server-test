@@ -5,7 +5,10 @@
 #include <api-standard.h>
 class userdatabase {
 public:
+    userdatabase(const userdatabase&) = delete;
+    userdatabase operator=(const userdatabase&) = delete;
     ~userdatabase();
+    size_t get_user_count();
     apistandard::user get(size_t id);
     void set(size_t id, const apistandard::user& newer);
     bool verify_creds(size_t id, const std::string& password);
