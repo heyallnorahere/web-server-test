@@ -2,6 +2,7 @@
 #include <api-standard.h>
 #include <iostream>
 #include "userdatabase.h"
+#include "log.h"
 #ifdef SYSTEM_UNIX
 void print_colored_unix(const apistandard::message& message) {
     std::string displayname = "Anonymous user";
@@ -28,6 +29,18 @@ void to_json(nlohmann::json& j, const response_struct& rs) {
     j["error"] = rs.error;
     j["succeeded"] = rs.succeeded;
 }
+apistandard::logmessage create_logmessage(const apistandard::message& m) {
+    apistandard::logmessage lm;
+    lm.content = m.content;
+    lm.color = m.color;
+    if (m.from.exists) {
+        auto u = userdatabase::get_database().get(m.from.l.id);
+        lm.from = u.displayname;
+    } else {
+        lm.from = "Anonymous";
+    }
+    return lm;
+}
 void message_handler(const std::shared_ptr<restbed::Session> session) {
     const auto request = session->get_request();
     size_t length = request->get_header("Content-Length", 0);
@@ -47,6 +60,7 @@ void message_handler(const std::shared_ptr<restbed::Session> session) {
                 return;
             }
             print_colored(message);
+            log::get().push_back(create_logmessage(message));
             response.succeeded = true;
         } else if (contenttype == "text/plain") {
             std::cout << data << std::endl;

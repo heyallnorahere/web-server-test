@@ -9,6 +9,11 @@ namespace apistandard {
             m.from.exists = true;
         }
     }
+    void from_json(const nlohmann::json& j, logmessage& m) {
+        j["content"].get_to(m.content);
+        j["color"].get_to(m.color);
+        j["from"].get_to(m.from);
+    }
     void to_json(nlohmann::json& j, const message& m) {
         j["content"] = m.content;
         j["color"] = m.color;
@@ -17,6 +22,11 @@ namespace apistandard {
         } else {
             j["from"] = nullptr;
         }
+    }
+    void to_json(nlohmann::json& j, const logmessage& m) {
+        j["content"] = m.content;
+        j["color"] = m.color;
+        j["from"] = m.from;
     }
     message create_message(const std::string& content, color color) {
         message m;

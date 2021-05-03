@@ -27,9 +27,9 @@ namespace guifrontend {
                 "Purple",
                 "Black",
             };
-            ImGui::Columns(3);
+            ImGui::Columns(2);
             ImGui::Combo("##ColorInput", &index, items.data(), items.size());
-            ImGui::NextColumn();
+            ImGui::SameLine();
             ImGui::InputText("##MessageInput", &message);
             ImGui::NextColumn();
             if (ImGui::Button("Send")) {
@@ -70,6 +70,7 @@ namespace guifrontend {
                 }
                 nlohmann::json json_data = message_struct;
                 std::string address = settings->get_settings().server_address;
+                // we dont care about the response for now
                 util::request(util::request_type::POST, address + "/message", { { "Content-Type", "application/json" } }, json_data.dump());
             }
             ImGui::Columns(1);
