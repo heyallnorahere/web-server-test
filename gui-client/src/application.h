@@ -11,6 +11,7 @@ namespace guifrontend {
         void render();
         void update_window();
         bool should_window_close();
+        void set_panel_name_map(const std::vector<std::string>& map);
         void add_panel(const std::shared_ptr<panel>& p);
         std::shared_ptr<panel> get_panel(size_t index);
         application(const application&) = delete;
@@ -21,6 +22,7 @@ namespace guifrontend {
         void init_imgui();
         void terminate_imgui();
         std::vector<std::shared_ptr<panel>> m_panels;
+        std::vector<std::string> m_panel_name_map;
         void* m_window;
         double m_gl_version;
     };

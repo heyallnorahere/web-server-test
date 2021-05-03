@@ -24,6 +24,15 @@ namespace guifrontend {
                 p->render();
             }
         }
+        {
+            ImGui::Begin("Windows");
+            for (size_t i = 0; i < this->m_panels.size(); i++) {
+                auto p = this->m_panels[i];
+                std::string label = (i < this->m_panel_name_map.size() ? this->m_panel_name_map[i] : ("Window #" + std::to_string(i)));
+                ImGui::Checkbox(label.c_str(), &p->m_visible);
+            }
+            ImGui::End();
+        }
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     }
@@ -33,6 +42,9 @@ namespace guifrontend {
     }
     bool application::should_window_close() {
         return glfwWindowShouldClose((GLFWwindow*)this->m_window);
+    }
+    void application::set_panel_name_map(const std::vector<std::string>& map) {
+        this->m_panel_name_map = map;
     }
     void application::add_panel(const std::shared_ptr<panel>& p) {
         this->m_panels.push_back(p);

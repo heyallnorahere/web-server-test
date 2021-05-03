@@ -1,5 +1,5 @@
 #include "login_panel.h"
-#include <curl/curl.h>
+//#include <curl/curl.h>
 #include <imgui.h>
 #include <misc/cpp/imgui_stdlib.h>
 #include <api-standard.h>
@@ -44,8 +44,8 @@ namespace guifrontend {
             }
             ImGui::End();
         }
-        size_t login_panel::get_logged_in_user() {
-            return (this->m_status == status::LOGGED_IN) ? this->m_user : (size_t)-1;
+        login_panel::login login_panel::get_login() {
+            return (this->m_status == status::LOGGED_IN) ? this->m_login : login{ (size_t)-1, "" };
         }
         void login_panel::send_request(const std::string& displayname, const std::string& password) {
             auto settings = this->m_parent->get_panel(this->m_settings_panel_index);
@@ -77,7 +77,8 @@ namespace guifrontend {
             json_data = nlohmann::json::parse(response.data);
             auto verification = json_data.get<apistandard::login_verification>();
             if (verification.is_valid) {
-                this->m_user = id;
+                this->m_login.id = login.id;
+                this->m_login.password = login.password;
                 this->m_status = status::LOGGED_IN;
             } else {
                 this->m_status = status::FAILED;
