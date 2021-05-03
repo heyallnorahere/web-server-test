@@ -15,13 +15,15 @@ namespace guifrontend {
         }
         void message_log(const std::string& address) {
             auto response = util::request(util::request_type::GET, address + "/log");
-            assert(response.code == 200);
-            nlohmann::json json_data = nlohmann::json::parse(response.data);
-            auto log = json_data.get<std::vector<apistandard::logmessage>>();
+            std::vector<apistandard::logmessage> log;
+            if (response.code == 200) {
+                nlohmann::json json_data = nlohmann::json::parse(response.data);
+                if (!json_data.is_null()) json_data.get_to(log);
+            }
             ImGui::BeginChild("Message Log", { 200, 200 }, ImGuiWindowFlags_AlwaysVerticalScrollbar);
             for (const auto& msg : log) {
                 ImGui::Separator();
-                ImGui::Text(msg.from.c_str());
+                ImGui::TextUnformatted(msg.from.c_str());
                 ImVec4 color(0.f, 0.f, 0.f, 1.f);
                 apistandard::color color_bits = msg.color;
                 if (color_bits & apistandard::RED) {

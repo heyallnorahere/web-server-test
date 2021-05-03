@@ -37,8 +37,21 @@ namespace guifrontend {
             static std::string displayname, password;
             ImGui::InputText("Username", &displayname);
             ImGui::InputText("Password", &password, ImGuiInputTextFlags_Password);
+            auto settings = this->m_parent->get_panel(this->m_settings_panel_index);
+            std::string address = ((settings_panel*)settings.get())->get_settings().server_address;
             if (ImGui::Button("Login")) {
-                this->send_request(displayname, password);
+                this->send_request(displayname, password, address);
+                displayname.clear();
+                password.clear();
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Register")) {
+                apistandard::newuser nu;
+                nu.displayname = displayname;
+                nu.password = password;
+                nlohmann::json json_data = nu;
+                util::request(util::request_type::POST, address + "/user/new", { { "Content-Type", "application/json" } }, json_data.dump());
+                this->send_request(displayname, password, address);
                 displayname.clear();
                 password.clear();
             }
@@ -47,9 +60,7 @@ namespace guifrontend {
         login_panel::login login_panel::get_login() {
             return (this->m_status == status::LOGGED_IN) ? this->m_login : login{ (size_t)-1, "" };
         }
-        void login_panel::send_request(const std::string& displayname, const std::string& password) {
-            auto settings = this->m_parent->get_panel(this->m_settings_panel_index);
-            std::string address = ((settings_panel*)settings.get())->get_settings().server_address;
+        void login_panel::send_request(const std::string& displayname, const std::string& password, const std::string& address) {
             auto response = util::request(util::request_type::GET, address + "/user/count");
             assert(response.code == 200);
             int count = atoi(response.data.c_str());

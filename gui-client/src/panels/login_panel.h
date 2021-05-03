@@ -19,7 +19,7 @@ namespace guifrontend {
             virtual void render() override;
             login get_login();
         private:
-            void send_request(const std::string& displayname, const std::string& password);
+            void send_request(const std::string& displayname, const std::string& password, const std::string& address);
             size_t m_settings_panel_index;
             status m_status;
             login m_login;
