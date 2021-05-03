@@ -28,6 +28,8 @@ namespace guifrontend {
                 if (response.code == 200) {
                     nlohmann::json json_data = nlohmann::json::parse(response.data);
                     if (!json_data.is_null()) json_data.get_to(log);
+                } else {
+                    log.clear();
                 }
                 last_request = current_time;
             }
