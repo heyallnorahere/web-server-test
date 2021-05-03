@@ -3,6 +3,7 @@
 #include <misc/cpp/imgui_stdlib.h>
 #include <api-standard.h>
 #include <vector>
+#include <chrono>
 #include "login_panel.h"
 #include "settings_panel.h"
 #include "../application.h"
@@ -13,12 +14,22 @@ namespace guifrontend {
             this->m_settings_panel_index = settings_index;
             this->m_login_panel_index = login_index;
         }
+        double get_time() {
+            using namespace std::chrono;
+            return duration_cast<duration<double>>(system_clock::now().time_since_epoch()).count();
+        }
         void message_log(const std::string& address) {
-            auto response = util::request(util::request_type::GET, address + "/log");
-            std::vector<apistandard::logmessage> log;
-            if (response.code == 200) {
-                nlohmann::json json_data = nlohmann::json::parse(response.data);
-                if (!json_data.is_null()) json_data.get_to(log);
+            static std::vector<apistandard::logmessage> log;
+            static double last_request = get_time();
+            double current_time = get_time();
+            constexpr double interval = 0.25;
+            if (current_time - last_request >= interval) {
+                auto response = util::request(util::request_type::GET, address + "/log");
+                if (response.code == 200) {
+                    nlohmann::json json_data = nlohmann::json::parse(response.data);
+                    if (!json_data.is_null()) json_data.get_to(log);
+                }
+                last_request = current_time;
             }
             ImGui::BeginChild("Message Log", { 200, 200 }, ImGuiWindowFlags_AlwaysVerticalScrollbar);
             for (const auto& msg : log) {
