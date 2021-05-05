@@ -14,6 +14,10 @@ namespace apistandard {
         j["color"].get_to(m.color);
         j["from"].get_to(m.from);
     }
+    void from_json(const nlohmann::json& j, deletemessage& m) {
+        j["id"].get_to(m.id);
+        j["auth"].get_to(m.auth);
+    }
     void to_json(nlohmann::json& j, const message& m) {
         j["content"] = m.content;
         j["color"] = m.color;
@@ -27,6 +31,10 @@ namespace apistandard {
         j["content"] = m.content;
         j["color"] = m.color;
         j["from"] = m.from;
+    }
+    void to_json(nlohmann::json& j, const deletemessage& m) {
+        j["id"] = m.id;
+        j["auth"] = m.auth;
     }
     message create_message(const std::string& content, color color) {
         message m;

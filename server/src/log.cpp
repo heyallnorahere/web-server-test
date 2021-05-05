@@ -48,14 +48,21 @@ std::string log::dump() {
     return json_data.dump();
 }
 void log::push_back(const apistandard::logmessage& message) {
-    this->m.push_back(message);
+    auto copy = message;
+    copy.id = this->m.size();
+    this->m.push_back(copy);
     this->serialize();
+}
+void log::remove(size_t id) {
+    this->m.remove_if([&](const apistandard::logmessage& other) { return other == this->operator[](id); });
 }
 size_t log::size() const {
     return this->m.size();
 }
-const apistandard::logmessage& log::operator[](size_t index) const {
-    return this->m[index];
+const apistandard::logmessage& log::operator[](size_t id) const {
+    auto it = this->m.begin();
+    std::advance(it, id);
+    return *it;
 }
 void log::clear() {
     this->m.clear();

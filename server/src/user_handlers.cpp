@@ -10,6 +10,7 @@ void get_user_handler(const std::shared_ptr<restbed::Session> session) {
     apistandard::getuser getuserdata;
     getuserdata.id = user.id;
     getuserdata.displayname = user.displayname;
+    getuserdata.admin = user.admin;
     nlohmann::json json_data = getuserdata;
     session->close(restbed::OK, json_data.dump());
 }

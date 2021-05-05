@@ -32,9 +32,6 @@ int main(int argc, const char* argv[]) {
     auto print = std::make_shared<restbed::Resource>();
     print->set_path("/print");
     print->set_method_handler("POST", post_request_handler);
-    auto message = std::make_shared<restbed::Resource>();
-    message->set_path("/message");
-    message->set_method_handler("POST", message_handler);
     auto log = std::make_shared<restbed::Resource>();
     log->set_path("/log");
     log->set_method_handler("GET", get_log_handler);
@@ -43,9 +40,9 @@ int main(int argc, const char* argv[]) {
     settings->set_default_header("Connection", "close");
     restbed::Service service;
     service.publish(print);
-    service.publish(message);
     service.publish(log);
     add_user_handlers(service);
+    add_message_handlers(service);
     service.start(settings);
     return 0;
 }

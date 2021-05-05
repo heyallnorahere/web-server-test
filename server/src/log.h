@@ -12,15 +12,16 @@ public:
     void deserialize();
     std::string dump();
     void push_back(const apistandard::logmessage& message);
+    void remove(size_t id);
     size_t size() const;
-    const apistandard::logmessage& operator[](size_t index) const;
+    const apistandard::logmessage& operator[](size_t id) const;
     void clear();
     static log& get() {
         static log instance;
         return instance;
     }
 private:
-    std::vector<apistandard::logmessage> m;
+    std::list<apistandard::logmessage> m;
     std::string m_path;
     log();
 };
