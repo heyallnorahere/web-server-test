@@ -1,6 +1,7 @@
 #include "userdatabase.h"
 #include <fstream>
 #include <nlohmann/json.hpp>
+#include <bcrypt/BCrypt.hpp>
 static void to_json(nlohmann::json& j, const std::shared_ptr<apistandard::user>& u) {
     // very simple, but it works
     j = *u;
@@ -31,7 +32,7 @@ void userdatabase::set(size_t id, const apistandard::user& newer) {
 }
 bool userdatabase::verify_creds(size_t id, const std::string& password) {
     auto user = this->get(id);
-    return user.password == password;
+    return BCrypt::validatePassword(password, user.password);
 }
 size_t userdatabase::find(const std::string& displayname) {
     size_t id = (size_t)-1;
@@ -45,7 +46,7 @@ size_t userdatabase::find(const std::string& displayname) {
 }
 size_t userdatabase::new_user(const std::string& displayname, const std::string& password) {
     size_t id = this->m.size();
-    auto user = apistandard::create_user(id, displayname, password);
+    auto user = apistandard::create_user(id, displayname, BCrypt::generateHash(password));
     this->m.push_back(user);
     this->serialize();
     return id;

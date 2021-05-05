@@ -2,6 +2,7 @@
 This is a little server-client program I'm working on. Current supported platforms:
 - MacOS X
 - Ubuntu (It's what I'm running on GitHub Actions)
+- Windows
 
 ## Dependencies
 Dependencies required on all platforms:
