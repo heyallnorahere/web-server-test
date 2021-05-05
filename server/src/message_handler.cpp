@@ -14,6 +14,25 @@ void print_colored_unix(const apistandard::message& message) {
     std::cout << displayname << " says: \033[" << terminal_color_code << "m" << message.content << "\033[37m" << std::endl;
 }
 #define print_colored print_colored_unix
+#elif defined(_MSC_VER)
+#include <Windows.h>
+void print_colored_windows(const apistandard::message& message) {
+    std::string displayname = "Anonymous user";
+    if (message.from.exists) {
+        displayname = userdatabase::get_database().get(message.from.l.id).displayname;
+    }
+    std::cout << displayname << " says: " << std::flush;
+    HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
+    WORD color = 0;
+    if (message.color & apistandard::RED) color |= FOREGROUND_RED;
+    if (message.color & apistandard::GREEN) color |= FOREGROUND_GREEN;
+    if (message.color & apistandard::BLUE) color |= FOREGROUND_BLUE;
+    SetConsoleTextAttribute(console, color);
+    WriteConsoleA(console, message.content.c_str(), message.content.length(), NULL, NULL);
+    SetConsoleTextAttribute(console, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+    std::cout << std::endl;
+}
+#define print_colored print_colored_windows
 #else
 #error PLATFORM NOT SUPPORTED!
 #endif
