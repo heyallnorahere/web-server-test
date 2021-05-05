@@ -55,6 +55,7 @@ void log::push_back(const apistandard::logmessage& message) {
 }
 void log::remove(size_t id) {
     this->m.remove_if([&](const apistandard::logmessage& other) { return other == this->operator[](id); });
+    this->serialize();
 }
 size_t log::size() const {
     return this->m.size();

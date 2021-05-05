@@ -123,7 +123,7 @@ void add_message_handlers(restbed::Service& service) {
     message->set_method_handler("POST", message_handler);
     auto delete_message = std::make_shared<restbed::Resource>();
     delete_message->set_path("/message/delete");
-    delete_message->set_method_handler("POST", message_handler);
+    delete_message->set_method_handler("POST", delete_message_handler);
     service.publish(message);
     service.publish(delete_message);
 }
