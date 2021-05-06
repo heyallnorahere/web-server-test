@@ -20,6 +20,13 @@ static void post_request_handler(const std::shared_ptr<restbed::Session> session
 static void get_log_handler(const std::shared_ptr<restbed::Session> session) {
     session->close(restbed::OK, log::get().dump());
 }
+static void status_handler(const std::shared_ptr<restbed::Session> session) {
+    apistandard::status status;
+    // no checks right now, just a ping-like resource
+    status.up = true;
+    nlohmann::json json_data = status;
+    session->close(restbed::OK, json_data.dump());
+}
 int main(int argc, const char* argv[]) {
     std::string data_directory = "serverdata";
     if (argc > 2) {
@@ -35,12 +42,16 @@ int main(int argc, const char* argv[]) {
     auto log = std::make_shared<restbed::Resource>();
     log->set_path("/log");
     log->set_method_handler("GET", get_log_handler);
+    auto status = std::make_shared<restbed::Resource>();
+    status->set_path("/status");
+    status->set_method_handler("GET", status_handler);
     auto settings = std::make_shared<restbed::Settings>();
     settings->set_port(port);
     settings->set_default_header("Connection", "close");
     restbed::Service service;
     service.publish(print);
     service.publish(log);
+    service.publish(status);
     add_user_handlers(service);
     add_message_handlers(service);
     service.start(settings);

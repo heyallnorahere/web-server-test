@@ -10,6 +10,7 @@ namespace guifrontend {
                 FAILED,
                 IDLE,
                 USER_NOT_FOUND,
+                NO_SERVER,
             };
             struct login {
                 size_t id;

@@ -14,6 +14,7 @@ namespace guifrontend {
             void deserialize();
             data get_settings();
         private:
+            void check_settings();
             data m;
             std::string m_config_file;
         };

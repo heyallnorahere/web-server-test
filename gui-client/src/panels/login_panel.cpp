@@ -29,6 +29,9 @@ namespace guifrontend {
             case status::USER_NOT_FOUND:
                 statusname = "User not found";
                 break;
+            case status::NO_SERVER:
+                statusname = "No server address";
+                break;
             default:
                 statusname = "Unknown";
                 break;
@@ -46,14 +49,20 @@ namespace guifrontend {
             }
             ImGui::SameLine();
             if (ImGui::Button("Register")) {
-                apistandard::newuser nu;
-                nu.displayname = displayname;
-                nu.password = password;
-                nlohmann::json json_data = nu;
-                util::request(util::request_type::POST, address + "/user/new", { { "Content-Type", "application/json" } }, json_data.dump());
-                this->send_request(displayname, password, address);
-                displayname.clear();
-                password.clear();
+                if (!address.empty()) {
+                    apistandard::newuser nu;
+                    nu.displayname = displayname;
+                    nu.password = password;
+                    nlohmann::json json_data = nu;
+                    // we dont care about the response for now
+                    util::request(util::request_type::POST, address + "/user/new", { { "Content-Type", "application/json" } }, json_data.dump());
+                    this->send_request(displayname, password, address);
+                    displayname.clear();
+                    password.clear();
+                }
+                else {
+                    this->m_status = status::NO_SERVER;
+                }
             }
             ImGui::End();
         }
@@ -61,6 +70,10 @@ namespace guifrontend {
             return (this->m_status == status::LOGGED_IN) ? this->m_login : login{ (size_t)-1, "" };
         }
         void login_panel::send_request(const std::string& displayname, const std::string& password, const std::string& address) {
+            if (address.empty()) {
+                this->m_status = status::NO_SERVER;
+                return;
+            }
             auto response = util::request(util::request_type::GET, address + "/user/count");
             assert(response.code == 200);
             int count = atoi(response.data.c_str());

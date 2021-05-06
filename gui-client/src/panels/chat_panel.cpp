@@ -47,19 +47,24 @@ namespace guifrontend {
         }
         static void message_log(const std::string& address, login_panel* panel) {
             static std::vector<apistandard::logmessage> log;
-            static double last_request = get_time();
-            double current_time = get_time();
-            constexpr double interval = 0.25;
-            if (current_time - last_request >= interval) {
-                auto response = util::request(util::request_type::GET, address + "/log");
-                if (response.code == 200) {
-                    nlohmann::json json_data = nlohmann::json::parse(response.data);
-                    log.clear();
-                    if (!json_data.is_null()) json_data.get_to(log);
-                } else {
-                    log.clear();
+            if (!address.empty()) {
+                static double last_request = get_time();
+                double current_time = get_time();
+                constexpr double interval = 0.25;
+                if (current_time - last_request >= interval) {
+                    auto response = util::request(util::request_type::GET, address + "/log");
+                    if (response.code == 200) {
+                        nlohmann::json json_data = nlohmann::json::parse(response.data);
+                        log.clear();
+                        if (!json_data.is_null()) json_data.get_to(log);
+                    }
+                    else {
+                        log.clear();
+                    }
+                    last_request = current_time;
                 }
-                last_request = current_time;
+            } else {
+                log.clear();
             }
             ImGui::BeginChild("Message Log", { 400.f, 200.f }, ImGuiWindowFlags_AlwaysVerticalScrollbar);
             auto login = panel->get_login();
@@ -100,7 +105,7 @@ namespace guifrontend {
             ImGui::NextColumn();
             ImGui::InputText("##MessageInput", &message);
             ImGui::NextColumn();
-            if (ImGui::Button("Send")) {
+            if (ImGui::Button("Send") && !address.empty()) {
                 apistandard::color color;
                 switch (index) {
                 case 0:
