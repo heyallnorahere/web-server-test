@@ -30,7 +30,7 @@ static void status_handler(const std::shared_ptr<restbed::Session> session) {
 int main(int argc, const char* argv[]) {
     std::string data_directory = "serverdata";
     if (argc > 2) {
-        data_directory = argv[3];
+        data_directory = argv[2];
     }
     userdatabase::get_database().set_file_path(data_directory + "/users.json");
     log::get().set_file_path(data_directory + "/log.json");
