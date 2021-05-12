@@ -5,3 +5,4 @@
 #include "setting.h"
 #include "login.h"
 #include "status.h"
+#include "avatar.h"

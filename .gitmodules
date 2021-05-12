@@ -22,3 +22,6 @@
 [submodule "vendor/libbcrypt"]
 	path = vendor/libbcrypt
 	url = https://github.com/trusch/libbcrypt
+[submodule "vendor/stb"]
+	path = vendor/stb
+	url = https://github.com/nothings/stb

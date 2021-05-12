@@ -2,8 +2,20 @@
 #include <api-standard.h>
 #include <nlohmann/json.hpp>
 #include <base64.h>
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
 #include "userdatabase.h"
 #include <iostream>
+#include <fstream>
+#include <cassert>
+static bool file_exists(const std::string& path) {
+    std::ifstream file(path);
+    if (file.is_open()) {
+        file.close();
+        return true;
+    }
+    return false;
+}
 void get_user_handler(const std::shared_ptr<restbed::Session> session) {
     size_t id = session->get_request()->get_path_parameter("id", 0);
     auto user = userdatabase::get_database().get(id);
@@ -116,6 +128,28 @@ void verify_user_handler(const std::shared_ptr<restbed::Session> session) {
         session->close(restbed::OK, json_data.dump());
     });
 }
+extern std::string data_directory;
+void get_avatar_handler(const std::shared_ptr<restbed::Session> session) {
+    auto request = session->get_request();
+    std::string file = request->get_path_parameter("file", "default.png");
+    std::string path = data_directory + "/avatar/" + file;
+    if (!file_exists(path)) {
+        path = data_directory + "/avatar/default.png";
+        // if there is no default avatar, the client will crash, due to stb_image returning null on failure,
+        // so we just get this out of the way right now.
+        assert(file_exists(path));
+    }
+    apistandard::avatardata data;
+    unsigned char* bytes = stbi_load(path.c_str(), &data.width, &data.height, &data.channels, NULL);
+    if (bytes) {
+        for (int i = 0; i < data.width * data.height * data.channels; i++) {
+            data.data.push_back(bytes[i]);
+        }
+        stbi_image_free(bytes);
+    }
+    nlohmann::json json_data = data;
+    session->close(restbed::OK, json_data.dump());
+}
 void add_user_handlers(restbed::Service& service) {
     auto get_user = std::make_shared<restbed::Resource>();
     get_user->set_path("/user/{id: [0-9]}");
@@ -134,9 +168,13 @@ void add_user_handlers(restbed::Service& service) {
     auto verify_user = std::make_shared<restbed::Resource>();
     verify_user->set_path("/user/verify");
     verify_user->set_method_handler("POST", verify_user_handler);
+    auto get_avatar = std::make_shared<restbed::Resource>();
+    get_avatar->set_path("/avatar/{file: [a-z0-9]*.png}/get");
+    get_avatar->set_method_handler("GET", get_avatar_handler);
     service.publish(get_user);
     service.publish(get_user_count);
     service.publish(user_setting);
     service.publish(new_user);
     service.publish(verify_user);
+    service.publish(get_avatar);
 }

@@ -27,8 +27,9 @@ static void status_handler(const std::shared_ptr<restbed::Session> session) {
     nlohmann::json json_data = status;
     session->close(restbed::OK, json_data.dump());
 }
+std::string data_directory;
 int main(int argc, const char* argv[]) {
-    std::string data_directory = "serverdata";
+    data_directory = "serverdata";
     if (argc > 2) {
         data_directory = argv[2];
     }

@@ -14,3 +14,7 @@ set(IMGUI_SOURCE ${IMGUI_SOURCE_FILES} ${IMGUI_HEADER_FILES} ${IMGUI_OPENGL_BACK
 add_executable(gui-client ${CPP_SOURCE_FILES} ${PRIVATE_HEADER_FILES} ${IMGUI_SOURCE})
 target_link_libraries(gui-client libcurl api-standard glfw glad)
 set_property(TARGET gui-client PROPERTY CXX_STANDARD 17)
+option(WST_BUILD_DEVELOPER_MENU "Specifies whether or not to implement the developer menu in gui-client" OFF)
+if(WST_BUILD_DEVELOPER_MENU)
+    target_compile_definitions(gui-client PRIVATE BUILD_DEVELOPER_MENU)
+endif()
