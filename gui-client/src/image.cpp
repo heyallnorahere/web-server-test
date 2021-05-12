@@ -19,25 +19,25 @@ namespace guifrontend {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        int internal_format;
+        int format;
         switch (channels) {
         case 1:
-            internal_format = GL_RED;
+            format = GL_RED;
             break;
         case 2:
-            internal_format = GL_RG;
+            format = GL_RG;
             break;
         case 3:
-            internal_format = GL_RGB;
+            format = GL_RGB;
             break;
         case 4:
-            internal_format = GL_RGBA;
+            format = GL_RGBA;
             break;
         default:
             assert(false);
             break;
         }
-        glTexImage2D(GL_TEXTURE_2D, 0, internal_format, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data.data());
+        glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data.data());
         glGenerateMipmap(GL_TEXTURE_2D);
         glBindTexture(GL_TEXTURE_2D, 0);
     }
