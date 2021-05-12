@@ -18,8 +18,12 @@ namespace guifrontend {
             using namespace std::chrono;
             return duration_cast<duration<double>>(system_clock::now().time_since_epoch()).count();
         }
-        static void render_message(const apistandard::logmessage& msg, bool admin, size_t id, apistandard::login login, const std::string& address) {
+        static void render_message(const apistandard::logmessage& msg, bool admin, size_t id, apistandard::login login, const std::string& address, std::map<std::string, std::shared_ptr<image>>& avatars) {
             ImGui::Separator();
+            ImGui::Columns(2);
+            ImGui::SetColumnWidth(0, 30.f);
+            ImGui::Image(avatars[msg.from]->get_texture_id(), { 20.f, 20.f });
+            ImGui::NextColumn();
             ImGui::TextUnformatted(msg.from.c_str());
             ImVec4 color(0.f, 0.f, 0.f, 1.f);
             apistandard::color color_bits = msg.color;
@@ -44,8 +48,9 @@ namespace guifrontend {
                     util::request(util::request_type::POST, address + "/message/delete", { { "Content-Type", "application/json" } }, json_data.dump());
                 }
             }
+            ImGui::Columns(1);
         }
-        static void message_log(const std::string& address, login_panel* panel) {
+        static void message_log(const std::string& address, login_panel* panel, std::map<size_t, std::shared_ptr<image>>& cache) {
             static std::vector<apistandard::logmessage> log;
             if (!address.empty()) {
                 static double last_request = get_time();
@@ -75,8 +80,29 @@ namespace guifrontend {
                 auto user = json_data.get<apistandard::getuser>();
                 admin = user.admin;
             }
+            std::map<std::string, std::shared_ptr<image>> avatars;
+            for (const auto& msg : log) {
+                if (avatars.find(msg.from) != avatars.end()) {
+                    continue;
+                }
+                size_t id = util::find_user(msg.from, address);
+                if (cache.find(id) != cache.end()) {
+                    avatars[msg.from] = cache[id];
+                }
+                else {
+                    // the avatar has not been cached yet, so lets pull and cache it
+                    std::string url = address + "/avatar/" + std::to_string(id) + ".png/get";
+                    auto response = util::request(util::request_type::GET, url);
+                    assert(response.code == 200);
+                    nlohmann::json json_data = nlohmann::json::parse(response.data);
+                    auto data = json_data.get<apistandard::avatardata>();
+                    auto avatar = std::make_shared<image>(data.data, data.width, data.height, data.channels);
+                    cache[id] = avatar;
+                    avatars[msg.from] = avatar;
+                }
+            }
             for (size_t i = 0; i < log.size(); i++) {
-                render_message(log[i], admin, i, { login.id, login.password }, address);
+                render_message(log[i], admin, i, { login.id, login.password }, address, avatars);
             }
             ImGui::Separator();
             ImGui::EndChild();
@@ -97,7 +123,7 @@ namespace guifrontend {
                 "Purple",
                 "Black",
             };
-            message_log(address, (login_panel*)this->m_parent->get_panel(this->m_login_panel_index).get());
+            message_log(address, (login_panel*)this->m_parent->get_panel(this->m_login_panel_index).get(), this->m_cache);
             ImGui::Columns(3);
             ImGui::SetColumnWidth(0, 100.f);
             ImGui::SetColumnWidth(1, 250.f);
@@ -147,6 +173,9 @@ namespace guifrontend {
             }
             ImGui::Columns(1);
             ImGui::End();
+        }
+        void chat_panel::clear_cache() {
+            this->m_cache.clear();
         }
     }
 }

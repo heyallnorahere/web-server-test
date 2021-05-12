@@ -2,6 +2,8 @@
 #include <cstdio>
 #include <cassert>
 #include <curl/curl.h>
+#include <nlohmann/json.hpp>
+#include <api-standard.h>
 namespace guifrontend {
     namespace util {
         bool file_exists(const std::string& path) {
@@ -61,6 +63,23 @@ namespace guifrontend {
             r.data = write.data;
             curl_easy_cleanup(c);
             return r;
+        }
+        size_t find_user(const std::string& displayname, const std::string& serveraddress) {
+            auto response = request(request_type::GET, serveraddress + "/user/count");
+            assert(response.code == 200);
+            int count = atoi(response.data.c_str());
+            size_t id = (size_t)-1;
+            for (int i = 0; i < count; i++) {
+                response = request(request_type::GET, serveraddress + "/user/" + std::to_string(i));
+                assert(response.code == 200);
+                nlohmann::json json_data = nlohmann::json::parse(response.data);
+                auto user = json_data.get<apistandard::getuser>();
+                if (user.displayname == displayname) {
+                    id = i;
+                    break;
+                }
+            }
+            return id;
         }
     }
 }

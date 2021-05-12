@@ -5,7 +5,6 @@ namespace apistandard {
         j["id"].get_to(gu.id);
         j["displayname"].get_to(gu.displayname);
         j["admin"].get_to(gu.admin);
-        j["avatar"].get_to(gu.avatar);
     }
     void from_json(const nlohmann::json& j, newuser& nu) {
         j["displayname"].get_to(nu.displayname);
@@ -16,13 +15,11 @@ namespace apistandard {
         j["displayname"].get_to(u.displayname);
         j["password"].get_to(u.password);
         j["admin"].get_to(u.admin);
-        j["avatar"].get_to(u.avatar);
     }
     void to_json(nlohmann::json& j, const getuser& gu) {
         j["id"] = gu.id;
         j["displayname"] = gu.displayname;
         j["admin"] = gu.admin;
-        j["avatar"] = gu.avatar;
     }
     void to_json(nlohmann::json& j, const newuser& nu) {
         j["displayname"] = nu.displayname;
@@ -33,7 +30,6 @@ namespace apistandard {
         j["displayname"] = u.displayname;
         j["password"] = u.password;
         j["admin"] = u.admin;
-        j["avatar"] = u.avatar;
     }
     user create_user(size_t id, const std::string& displayname, const std::string& password) {
         user u;

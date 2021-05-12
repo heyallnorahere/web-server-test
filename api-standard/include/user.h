@@ -8,7 +8,6 @@ namespace apistandard {
         size_t id;
         std::string displayname;
         bool admin;
-        avatar avatar;
     };
     struct newuser {
         std::string displayname, password;
@@ -17,7 +16,6 @@ namespace apistandard {
         size_t id;
         std::string displayname, password;
         bool admin;
-        avatar avatar;
     };
     void from_json(const nlohmann::json& j, getuser& gu);
     void from_json(const nlohmann::json& j, newuser& nu);

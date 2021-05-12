@@ -4,6 +4,8 @@
 #include <base64.h>
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include <stb_image_write.h>
 #include "userdatabase.h"
 #include <iostream>
 #include <fstream>
@@ -150,6 +152,36 @@ void get_avatar_handler(const std::shared_ptr<restbed::Session> session) {
     nlohmann::json json_data = data;
     session->close(restbed::OK, json_data.dump());
 }
+void set_avatar_handler(const std::shared_ptr<restbed::Session> session) {
+    auto request = session->get_request();
+    size_t length = request->get_header("Content-Length", 0);
+    session->fetch(length, [request](std::shared_ptr<restbed::Session> session, const restbed::Bytes& body) {
+        std::string data = std::string((char*)body.data(), body.size());
+        nlohmann::json json_data = nlohmann::json::parse(data);
+        auto requestdata = json_data.get<apistandard::setavatar>();
+        std::string file = request->get_path_parameter("file", "");
+        if (file.empty()) {
+            session->close(restbed::NOT_FOUND);
+            return;
+        }
+        size_t id = (size_t)-1;
+        // this is the the c way of doing it; couldnt think of any others
+        sscanf(file.c_str(), "%llu.png", &id);
+        assert(id != (size_t)-1);
+        if (id >= userdatabase::get_database().get_user_count()) {
+            session->close(restbed::NOT_FOUND);
+            return;
+        }
+        if (!userdatabase::get_database().verify_creds(requestdata.user.id, requestdata.user.password) || (id != requestdata.user.id)) {
+            session->close(restbed::FORBIDDEN);
+            return;
+        }
+        auto imagedata = requestdata.content;
+        std::string path = data_directory + "/avatar/" + file;
+        stbi_write_png(path.c_str(), imagedata.width, imagedata.height, imagedata.channels, imagedata.data.data(), imagedata.width * imagedata.channels);
+        session->close(restbed::OK);
+    });
+}
 void add_user_handlers(restbed::Service& service) {
     auto get_user = std::make_shared<restbed::Resource>();
     get_user->set_path("/user/{id: [0-9]}");
@@ -171,10 +203,14 @@ void add_user_handlers(restbed::Service& service) {
     auto get_avatar = std::make_shared<restbed::Resource>();
     get_avatar->set_path("/avatar/{file: [a-z0-9]*.png}/get");
     get_avatar->set_method_handler("GET", get_avatar_handler);
+    auto set_avatar = std::make_shared<restbed::Resource>();
+    set_avatar->set_path("/avatar/{file: [0-9].png}/set");
+    set_avatar->set_method_handler("POST", set_avatar_handler);
     service.publish(get_user);
     service.publish(get_user_count);
     service.publish(user_setting);
     service.publish(new_user);
     service.publish(verify_user);
     service.publish(get_avatar);
+    service.publish(set_avatar);
 }
