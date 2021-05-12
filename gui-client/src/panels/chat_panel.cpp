@@ -88,8 +88,7 @@ namespace guifrontend {
                 size_t id = util::find_user(msg.from, address);
                 if (cache.find(id) != cache.end()) {
                     avatars[msg.from] = cache[id];
-                }
-                else {
+                } else {
                     // the avatar has not been cached yet, so lets pull and cache it
                     std::string url = address + "/avatar/" + std::to_string(id) + ".png/get";
                     auto response = util::request(util::request_type::GET, url);

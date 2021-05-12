@@ -18,7 +18,7 @@ static std::vector<panel_descriptor> make_descriptors() {
     using namespace guifrontend::panels;
     std::vector<panel_descriptor> descriptors;
     add_panel<login_panel>(descriptors, "Login", 1);
-    add_panel<settings_panel>(descriptors, "Settings");
+    add_panel<settings_panel>(descriptors, "Settings", 0, 2);
     add_panel<chat_panel>(descriptors, "Chat", 1, 0);
     return descriptors;
 }

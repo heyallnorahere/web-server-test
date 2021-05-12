@@ -8,7 +8,7 @@ namespace guifrontend {
             struct data {
                 std::string server_address;
             };
-            settings_panel();
+            settings_panel(size_t login_index, size_t chat_index);
             virtual void render() override;
             void serialize();
             void deserialize();
@@ -17,6 +17,7 @@ namespace guifrontend {
             void check_settings();
             data m;
             std::string m_config_file;
+            size_t m_login_panel_index, m_chat_panel_index;
         };
     }
 }

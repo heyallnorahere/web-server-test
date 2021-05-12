@@ -142,7 +142,7 @@ void get_avatar_handler(const std::shared_ptr<restbed::Session> session) {
         assert(file_exists(path));
     }
     apistandard::avatardata data;
-    unsigned char* bytes = stbi_load(path.c_str(), &data.width, &data.height, &data.channels, NULL);
+    uint8_t* bytes = stbi_load(path.c_str(), &data.width, &data.height, &data.channels, NULL);
     if (bytes) {
         for (int i = 0; i < data.width * data.height * data.channels; i++) {
             data.data.push_back(bytes[i]);
