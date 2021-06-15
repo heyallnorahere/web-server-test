@@ -1,6 +1,7 @@
 #include "image.h"
 #include <glad/glad.h>
 #include <cassert>
+#include <stddef.h> // size_t isnt defined on arch??????
 namespace guifrontend {
     image::image(const std::vector<uint8_t>& data, int width, int height, int channels) {
         this->setup(data, width, height, channels);
